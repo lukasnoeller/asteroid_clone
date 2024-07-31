@@ -1,16 +1,28 @@
 #include "../headers/asteroids_clone.hpp"
 
 
-Object::Object(Texture2D texture, std::string color, float scale = 1.0, Vector2 vector, Vector2 position, int speed) : texture(texture), color(color), scale(scale), vector(vector), position(position), speed(speed)
+Object::Object(Texture2D texture, std::string color, float scale , const int screenWidth, const int screenHeight, float speed) : texture(texture), color(color), scale(scale), screenWidth(screenWidth), screenHeight(screenHeight), speed(speed)
 {
     this->health = 100;
-    this->acceleration = 0;
-    this->dec_factor = 0.9; 
-    this->hitbox = {this->position.x, this->position.y, (float)this->texture.width, (float)this->texture.height};
+    this->dec_factor = 0.994f;
+    this->vector = { 1.0f , 0.0f };
+    this->position =  { this->screenWidth / 2.0f , this->screenHeight / 2.0f };
+    this->rotation = 0.0f;
+    this->hitbox = {0.0f, 0.0f, (float)this->texture.width, (float)this->texture.height};
+}
+
+Texture2D Object::getTexture()
+{
+    return this->texture;
 }
 Rectangle Object::getHitBox()
 {
     return this->hitbox;
+}
+Rectangle Object::getDestRec()
+{
+    Rectangle destRec = { this->position.x , this->position.y,   this->texture.width, this->texture.height };
+    return destRec;
 }
 int Object::getHealth()
 {
@@ -32,9 +44,28 @@ void Object::setVector(Vector2 vector_new)
 {
     this->vector = vector_new;
 }
-void Object::rotate(int angle)
+Vector2 Object::getPosition()
 {
-    this->vector = Vector2Rotate(this->vector, DEG2RAD * (float)angle );
+    return this->position;
+}
+Vector2 Object::getOrigin()
+{
+    float width  = this->texture.width;
+    float height = this->texture.height;
+    Vector2 origin;
+    origin = { width / 2.0f, height / 2.0f};
+    return origin;
+
+}
+void Object::rotate(float angle)
+{
+    this->rotation =  angle;
+    this->vector.x = cos( DEG2RAD * rotation);
+    this->vector.y = sin( DEG2RAD * rotation);
+}
+float Object::getRotation()
+{
+    return this->rotation;
 }
 void Object::drift()
 {
@@ -81,5 +112,19 @@ bool Object::isthereCrash(Object object)
 {
     return this->doRectIntersect(this->hitbox, object.getHitBox());
 }
+void Object::setSpeed(float s)
+{
+    this->speed = s;
+}
+Ship::Ship(Texture2D texture, std::string color, float scale, const int screenWidth, const int screenHeight, float speed) : Object(texture, color, scale, screenWidth, screenHeight, speed)
+{
+    this->deaths = 0;
+}
+
+void Ship::accelerate()
+{
+    this->setSpeed(2.0f);
+}
+
 
 
