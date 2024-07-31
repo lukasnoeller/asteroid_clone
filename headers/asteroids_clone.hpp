@@ -10,30 +10,40 @@ class Object
     int health;
     std::string color;
     float scale;
+    const int screenWidth;
+    const int screenHeight;
     Vector2 vector;
     Vector2 position;
-    int speed;
+    float rotation;
+    float speed;
     float dec_factor; 
-    int acceleration;
     public:
-    Object(Texture2D texture, std::string color, float scale, Vector2 vector, Vector2 position, int speed ); 
+    Object(Texture2D texture, std::string color, float scale, const int screenWidth, const int screenHeight, float speed); 
+    Texture2D getTexture();
     Rectangle getHitBox();
+    Rectangle getDestRec();
     int getHealth();
     void setHealth(int health_new);
     std::string getColor();
     Vector2 getVector();
     void setVector(Vector2 vector_new);
-    void rotate(int angle);
+    Vector2 getPosition();
+    Vector2 getOrigin();
+    void rotate(float angle); // in deg
+    float getRotation();
     void drift();
     void decelerate();
     bool doRectIntersect(Rectangle rectangle1, Rectangle rectangle2);
     bool isthereCrash(Object object);
+    void setSpeed(float s);
+
   };
   class Ship: public Object
 {
     private: 
     int deaths;
     public:
+    Ship(Texture2D texture, std::string color, float scale, const int screenWidth, const int screenHeight, float speed);
     void move();
     void shoot();
     void accelerate();
