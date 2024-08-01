@@ -108,7 +108,7 @@ void Object::drift()
             this->position.x = 1;
         if(this->outDown())
             this->position.y = 1;
-        if(this->outRight())
+        if(this->outUp())
             this->position.y = this->screenHeight - 1;
     }
     DrawTexturePro(this->texture, this->hitbox, this->getDestRec(), this->getOrigin(), this->rotation, this->color);
