@@ -202,14 +202,27 @@ Ship::Ship(Texture2D texture, Color color, float scale, const int screenWidth, c
     this->deaths = 0;
     this->beam_sprite = beam_sprite;
     this->number_of_beams = 0;
-    this->max_num_beams = 30;
+    this->max_num_beams = NUM_BEAMS;
 }
 void Ship::shoot()
 {
     if(this->number_of_beams < this->max_num_beams)
         this->number_of_beams++;
     else
-        this->number_of_beams = 1;
+    {
+        Object beams_copy[NUM_BEAMS];
+        // Create copy of beams array
+        for(int i = 0; i < this->max_num_beams - 1; i++)
+        {
+            beams_copy[i] = this->beams[i+1];
+        }
+        // Now replace values ans shift array over one
+        for(int i = 0; i < this->max_num_beams - 1; i++)
+        {
+            this->beams[i] = beams_copy[i];
+        }
+    }
+        
         this->beams[this->number_of_beams -1] = Object(this->beam_sprite, this->getColor(), 0.6 , this->getScreenWidth(), this->getScreenHeight(), 6.0);
         this->beams[this->number_of_beams -1].setPosition(Vector2Add(this->getPosition(), Vector2Scale(this->getVector(), 0.8 *this->getTexture().width)) );
         this->beams[this->number_of_beams -1].setVector(this->getVector());
@@ -242,6 +255,12 @@ int Ship::getNumBeams()
 
 Asteroid::Asteroid(Texture2D texture, Color color, float scale, const int screenWidth, const int screenHeight, float speed) : Object(texture, color, scale, screenWidth, screenHeight, speed)
 {
-   
+    float vector_x = float(rand() % 100)/100.0f;
+    float vector_y = float(rand() % 100)/100.0f;
+    float pos_x = float(rand() % this->getScreenWidth());
+    float pos_y = float(rand() % this->getScreenWidth());
+   this->setVector({ vector_x , vector_y });
+   this->setPosition({ pos_x , pos_y });
 }
+Asteroid::Asteroid() : Object() {}
 
