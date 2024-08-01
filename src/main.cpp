@@ -6,7 +6,14 @@ int main(void)
     const int screenWidth = 1500;
     const int screenHeight = 800;
 InitWindow(screenWidth, screenHeight, "Asteroids");
-Ship ship(LoadTexture("resources/futurama_ship_bw.png"), GREEN, 1.0, screenWidth, screenHeight , 2.0, LoadTexture("resources/beam.png")); 
+Ship ship(LoadTexture("resources/futurama_ship_bw.png"), GREEN, 1.0, screenWidth, screenHeight , 2.0, LoadTexture("resources/beam.png"));
+int size = rand() % 15 + 5;
+Asteroid* asteroids = new Asteroid[size];
+for(int i = 0; i < size; i++)
+{
+    asteroids[i] = Asteroid(LoadTexture("resources/large_meteor.png"), WHITE, float(rand() % 500)/100, screenWidth, screenHeight , 2.0);
+}
+
 SetTargetFPS(60);
 float angle = 0;
      while (!WindowShouldClose())   
@@ -29,6 +36,10 @@ float angle = 0;
            ship.shoot();
         } 
         ship.drift();
+        for(int i = 0; i < size; i++)
+        {
+            asteroids[i].drift();
+        }
         ship.drift_beams();
         ship.decelerate();
        
@@ -36,7 +47,7 @@ float angle = 0;
         DrawLine(0, 0, 0, screenHeight, BLUE);
         
          DrawText(TextFormat("Coordinates of Ship Origin: %lf, %lf",ship.getPosition().x,ship.getPosition().y),500, 250, 15, GRAY);
-        DrawText(TextFormat("Ship vecvtor: %lf, %lf",ship.getVector().x,ship.getVector().y),500, 280, 15, GRAY);
+        DrawText(TextFormat("Ship vector: %lf, %lf",ship.getVector().x,ship.getVector().y),500, 280, 15, GRAY);
          DrawText(TextFormat("Number of beams: %ld",ship.getNumBeams()),500, 300, 15, GRAY);
          
         // DrawText(TextFormat("Rotation:  %i", rotation), screenWidth - 700, screenHeight -250, 15, GRAY);
@@ -51,6 +62,7 @@ float angle = 0;
 
     CloseWindow();                // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
-
+    // Deallocate memory
+    delete[] asteroids;
     return 0;
 }
