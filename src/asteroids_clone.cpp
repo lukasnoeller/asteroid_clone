@@ -1,19 +1,29 @@
 #include "../headers/asteroids_clone.hpp"
 
 
-Object::Object(Texture2D texture, Color color, float scale , const int screenWidth, const int screenHeight, float speed) : texture(texture), color(color), scale(scale), screenWidth(screenWidth), screenHeight(screenHeight), speed(speed)
+Object::Object(Texture2D texture, Color color, float scale , int screenWidth, int screenHeight, float speed) : texture(texture), color(color), scale(scale), screenWidth(screenWidth), screenHeight(screenHeight), speed(speed)
 {
     this->health = 100;
     this->dec_factor = 0.994f;
     this->vector = { 1.0f , 0.0f };
     this->position =  { this->screenWidth / 2.0f , this->screenHeight / 2.0f };
     this->rotation = 0.0f;
-    this->hitbox = {0.0f, 0.0f, (float)this->texture.width, (float)this->texture.height};
+    this->hitbox = {0.0f, 0.0f, (float)(this->texture.width) , (float)(this->texture.height) };
 }
+Object::Object() : health(0), dec_factor(0.0f), vector({0.0f, 0.0f}), position({0.0f, 0.0f}), rotation(0.0f),
+        hitbox({0.0f, 0.0f, 0.0f, 0.0f}), screenHeight(0), screenWidth(0) {}
 
 Texture2D Object::getTexture()
 {
     return this->texture;
+}
+int Object::getScreenWidth()
+{
+    return this->screenWidth;
+}
+int Object::getScreenHeight()
+{
+    return this->screenHeight;
 }
 Rectangle Object::getHitBox()
 {
@@ -21,7 +31,7 @@ Rectangle Object::getHitBox()
 }
 Rectangle Object::getDestRec()
 {
-    Rectangle destRec = { this->position.x , this->position.y,   this->texture.width, this->texture.height };
+    Rectangle destRec = { this->position.x , this->position.y, (float)(this->texture.width) * this->scale, (float)(this->texture.height) * this->scale };
     return destRec;
 }
 int Object::getHealth()
@@ -43,6 +53,10 @@ Vector2 Object::getVector()
 void Object::setVector(Vector2 vector_new)
 {
     this->vector = vector_new;
+}
+void Object::setPosition(Vector2 pos)
+{
+    this->position = pos;
 }
 Vector2 Object::getPosition()
 {
@@ -84,7 +98,19 @@ float Object::getRotation()
 }
 void Object::drift()
 {
+  
     this->position = Vector2Add(this->position, Vector2Scale(this->vector, this->speed));
+    if(this->outofBounds())
+    {
+        if(this->outLeft())
+            this->position.x = this->screenWidth - 1;
+        if(this->outRight())
+            this->position.x = 1;
+        if(this->outDown())
+            this->position.y = 1;
+        if(this->outRight())
+            this->position.y = this->screenHeight - 1;
+    }
     DrawTexturePro(this->texture, this->hitbox, this->getDestRec(), this->getOrigin(), this->rotation, this->color);
 }
 void Object::decelerate()
@@ -128,6 +154,41 @@ bool Object::isthereCrash(Object object)
 {
     return this->doRectIntersect(this->hitbox, object.getHitBox());
 }
+bool Object::outofBounds()
+{
+    if(this->position.x < 0 || this->position.x > this->screenWidth || this->position.y < 0 || this->position.y > screenHeight )
+        return true;
+    else 
+        return false;
+}
+bool Object::outLeft()
+{
+    if(this->position.x < 0)
+        return true;
+    else 
+        return false;
+}
+bool Object::outRight()
+{
+    if(this->position.x > this->screenWidth)
+        return true;
+    else 
+        return false;
+}
+bool Object::outDown()
+{
+    if(this->position.y > screenHeight)
+        return true;
+    else 
+        return false;
+}
+bool Object::outUp()
+{
+    if(this->position.y < 0)
+        return true;
+    else 
+        return false;
+}
 float Object::getSpeed()
 {
     return this->speed;
@@ -140,9 +201,19 @@ Ship::Ship(Texture2D texture, Color color, float scale, const int screenWidth, c
 {
     this->deaths = 0;
     this->beam_sprite = beam_sprite;
+    this->number_of_beams = 0;
+    this->max_num_beams = 30;
 }
 void Ship::shoot()
 {
+    if(this->number_of_beams < this->max_num_beams)
+        this->number_of_beams++;
+    else
+        this->number_of_beams = 1;
+        this->beams[this->number_of_beams -1] = Object(this->beam_sprite, this->getColor(), 0.6 , this->getScreenWidth(), this->getScreenHeight(), 6.0);
+        this->beams[this->number_of_beams -1].setPosition(Vector2Add(this->getPosition(), Vector2Scale(this->getVector(), 0.8 *this->getTexture().width)) );
+        this->beams[this->number_of_beams -1].setVector(this->getVector());
+
 }
 void Ship::accelerate()
 {   float speed_cap = 4.5f;
@@ -151,6 +222,22 @@ void Ship::accelerate()
         this->setSpeed(current_speed + 0.20);
     else 
         this->setSpeed(speed_cap);
+}
+
+void Ship::drift_beams()
+{
+    if(this->number_of_beams != 0)
+    {
+        for(int i = 0; i < this->number_of_beams; i++)
+    {
+        this->beams[i].drift();
+    }
+    }
+    
+}
+int Ship::getNumBeams()
+{
+ return this->number_of_beams;
 }
 
 
