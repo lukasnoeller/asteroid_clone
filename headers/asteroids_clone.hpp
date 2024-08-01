@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <string>
+#define NUM_BEAMS 30
 class Object 
   {  
     private:
@@ -36,7 +37,7 @@ class Object
     void rotate_to_right(); 
     void rotate_to_left();
     float getRotation();
-    void drift();
+    virtual void drift();
     void decelerate();
     bool doRectIntersect(Rectangle rectangle1, Rectangle rectangle2);
     bool isthereCrash(Object object);
@@ -54,7 +55,7 @@ class Object
     private: 
     int deaths;
     Texture2D beam_sprite;
-    Object beams[30];
+    Object beams[NUM_BEAMS];
     int number_of_beams;
     int max_num_beams;
     public:
@@ -72,5 +73,6 @@ class Asteroid: public Object
 {
   public:
   Asteroid(Texture2D texture, Color color, float scale, const int screenWidth, const int screenHeight, float speed);
+  Asteroid();
   void split();
 };
