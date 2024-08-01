@@ -1,7 +1,7 @@
 #include "../headers/asteroids_clone.hpp"
 
 
-Object::Object(Texture2D texture, std::string color, float scale , const int screenWidth, const int screenHeight, float speed) : texture(texture), color(color), scale(scale), screenWidth(screenWidth), screenHeight(screenHeight), speed(speed)
+Object::Object(Texture2D texture, Color color, float scale , const int screenWidth, const int screenHeight, float speed) : texture(texture), color(color), scale(scale), screenWidth(screenWidth), screenHeight(screenHeight), speed(speed)
 {
     this->health = 100;
     this->dec_factor = 0.994f;
@@ -32,7 +32,7 @@ void Object::setHealth(int health_new)
 {
     this->health = health_new;
 }
-std::string Object::getColor()
+Color Object::getColor()
 {
     return this->color;
 }
@@ -57,11 +57,26 @@ Vector2 Object::getOrigin()
     return origin;
 
 }
-void Object::rotate(float angle)
+void Object::rotate_to_right()
 {
-    this->rotation =  angle;
-    this->vector.x = cos( DEG2RAD * rotation);
-    this->vector.y = sin( DEG2RAD * rotation);
+    
+    this->vector.x = cos( DEG2RAD * this->rotation);
+    this->vector.y = sin( DEG2RAD * this->rotation);
+    if (this->rotation == 360)
+            {
+                this->rotation = 0;
+            }
+            else this->rotation += 1; 
+}
+void Object::rotate_to_left()
+{
+    this->vector.x = cos( DEG2RAD * this->rotation);
+    this->vector.y = sin( DEG2RAD * this->rotation);
+    if (this->rotation == 360)
+            {
+                this->rotation = 0;
+            }
+            else this->rotation -= 1; 
 }
 float Object::getRotation()
 {
@@ -70,6 +85,7 @@ float Object::getRotation()
 void Object::drift()
 {
     this->position = Vector2Add(this->position, Vector2Scale(this->vector, this->speed));
+    DrawTexturePro(this->texture, this->hitbox, this->getDestRec(), this->getOrigin(), this->rotation, this->color);
 }
 void Object::decelerate()
 {
@@ -112,18 +128,29 @@ bool Object::isthereCrash(Object object)
 {
     return this->doRectIntersect(this->hitbox, object.getHitBox());
 }
+float Object::getSpeed()
+{
+    return this->speed;
+}
 void Object::setSpeed(float s)
 {
     this->speed = s;
 }
-Ship::Ship(Texture2D texture, std::string color, float scale, const int screenWidth, const int screenHeight, float speed) : Object(texture, color, scale, screenWidth, screenHeight, speed)
+Ship::Ship(Texture2D texture, Color color, float scale, const int screenWidth, const int screenHeight, float speed, Texture2D beam_sprite) : Object(texture, color, scale, screenWidth, screenHeight, speed)
 {
     this->deaths = 0;
+    this->beam_sprite = beam_sprite;
 }
-
-void Ship::accelerate()
+void Ship::shoot()
 {
-    this->setSpeed(2.0f);
+}
+void Ship::accelerate()
+{   float speed_cap = 4.5f;
+    float current_speed = this->getSpeed();
+    if(current_speed < speed_cap)
+        this->setSpeed(current_speed + 0.20);
+    else 
+        this->setSpeed(speed_cap);
 }
 
 
