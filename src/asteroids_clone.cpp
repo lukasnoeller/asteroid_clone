@@ -240,5 +240,8 @@ int Ship::getNumBeams()
  return this->number_of_beams;
 }
 
-
+Asteroid::Asteroid(Texture2D texture, Color color, float scale, const int screenWidth, const int screenHeight, float speed) : Object(texture, color, scale, screenWidth, screenHeight, speed)
+{
+   
+}
 

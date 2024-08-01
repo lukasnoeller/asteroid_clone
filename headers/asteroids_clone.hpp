@@ -71,5 +71,6 @@ class Object
 class Asteroid: public Object
 {
   public:
+  Asteroid(Texture2D texture, Color color, float scale, const int screenWidth, const int screenHeight, float speed);
   void split();
 };
